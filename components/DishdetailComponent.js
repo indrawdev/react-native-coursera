@@ -3,7 +3,7 @@ import { ScrollView, Text, View, FlatList } from 'react-native';
 import { Card } from 'react-native-elements';
 import { DISHES } from '../shared/dishes';
 import { COMMENTS } from '../shared/comments';
-import { Icon } from 'react-native-elements';
+import { Card, Icon } from 'react-native-elements';
 
 
 function RenderDish(props) {
@@ -24,7 +24,7 @@ function RenderDish(props) {
 					name={props.favorite ? 'heart' : 'heart-o'}
 					type='font-awesome'
 					color='#f50'
-					onPress={() => { }}
+					onPress={() => { props.favorite ? console.log('Already favorite') : props.onPress() }}
 				/>
 			</Card>
 		);
@@ -71,12 +71,23 @@ class Dishdetail extends Component {
 	static navigationOptions = {
 		title: 'Dish Details'
 	};
+
+	markFavorite(dishId) {
+		this.setState({favorites: this.state.favorites.concat(dishId)});
+	}
+
 	render() {
 		const dishId = this.props.navigation.getParam('dishId', '');
 		return (
 			<ScrollView>
-				<RenderDish dish={this.state.dishes[+dishId]} />
-				<RenderComments comments={this.state.comments.filter((comment) => comment.dishId === dishId)} />
+				<RenderDish
+					dish={this.state.dishes[+dishId]}
+					favorite={this.state.favorites.some(el => el === dishId)}
+					onPress={() => this.markFavorite(dishId)}
+				/>
+				<RenderComments
+					comments={this.state.comments.filter((comment) => comment.dishId === dishId)}
+				/>
 			</ScrollView>
 		);
 	}
