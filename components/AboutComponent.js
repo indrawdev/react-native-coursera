@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import { LEADERS } from '../shared/leaders';
 import { baseUrl } from '../shared/baseUrl';
 
+import { Loading } from './LoadingComponent';
+
 const mapStateToProps = state => {
 	return {
 		leaders: state.leaders
@@ -60,13 +62,44 @@ class About extends Component {
 	};
 
 	render() {
-		return (
-			<ScrollView>
-				<History />
-				<CorporateLeadership leaders={this.state.leaders} />
-			</ScrollView>
-		);
+		if (this.props.leaders.isLoading) {
+			return (
+				<ScrollView>
+					<History />
+					<Card
+						title='Corporate Leadership'>
+						<Loading />
+					</Card>
+				</ScrollView>
+			);
+		}
+		else if (this.props.leaders.errMess) {
+			return (
+				<ScrollView>
+					<History />
+					<Card
+						title='Corporate Leadership'>
+						<Text>{this.props.leaders.errMess}</Text>
+					</Card>
+				</ScrollView>
+			);
+		}
+		else {
+			return (
+				<ScrollView>
+					<History />
+					<Card
+						title='Corporate Leadership'>
+						<FlatList
+							data={this.props.leaders.leaders}
+							renderItem={renderLeader}
+							keyExtractor={item => item.id.toString()}
+						/>
+					</Card>
+				</ScrollView>
+			);
+		}
 	}
 }
 
-export default About;
+export default connect(mapStateToProps)(About);
