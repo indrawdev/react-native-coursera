@@ -15,7 +15,7 @@ const mapStateToProps = state => {
 	}
 }
 
-const mapDispatchToProps = state => ({
+const mapDispatchToProps = dispatch => ({
 	deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId))
 })
 
@@ -27,32 +27,33 @@ class Favorites extends Component {
 
 	render() {
 		const { navigate } = this.props.navigation;
-		const rightButton = [
-			{
-				text: 'Delete',
-				type: 'delete',
-				onPress: () => {
-					Alert.alert(
-						'Delete Favorite?',
-						'Are you sure you wish to delete the favorite dish ' + item.name + '?',
-						[
-							{
-								text: 'Cancel',
-								onPress: () => console.log(item.name + 'Not Deleted'),
-								style: ' cancel'
-							},
-							{
-								text: 'OK',
-								onPress: () => this.props.deleteFavorite(item.id)
-							}
-						],
-						{ cancelable: false }
-					)
-				}
-			}
-		];
 
 		const renderMenuItem = ({ item, index }) => {
+			const rightButton = [
+				{
+					text: 'Delete',
+					type: 'delete',
+					onPress: () => {
+						Alert.alert(
+							'Delete Favorite?',
+							'Are you sure you wish to delete the favorite dish ' + item.name + '?',
+							[
+								{
+									text: 'Cancel',
+									onPress: () => console.log(item.name + 'Not Deleted'),
+									style: ' cancel'
+								},
+								{
+									text: 'OK',
+									onPress: () => this.props.deleteFavorite(item.id)
+								}
+							],
+							{ cancelable: false }
+						)
+					}
+				}
+			];
+
 			return (
 				<Swipeout right={rightButton} autoClose={true}>
 					<Animatable.View animation="fadeInRightBig" duration={2000}>
