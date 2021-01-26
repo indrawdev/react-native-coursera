@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Picker, Switch, Button, Modal } from 'react-native';
+import { Text, View, StyleSheet, Switch, Picker, Button, Modal, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 
@@ -100,7 +100,7 @@ class Reservation extends Component {
 				</View>
 				<Modal animationType={"slide"} transparent={false}
 					visible={this.state.showModal}
-					onDismiss={() => this.toggleModal()}
+					//onDismiss = {() => this.toggleModal() }
 					onRequestClose={() => this.toggleModal()}>
 					<View style={styles.modal}>
 						<Text style={styles.modalTitle}>Your Reservation</Text>

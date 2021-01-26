@@ -151,6 +151,7 @@ const CustomDrawerContentComponent = (props) => (
 					<Text style={styles.drawerHeaderText}>Ristorante Con Fusion</Text>
 				</View>
 			</View>
+			<DrawerItems {...props} />
 		</SafeAreaView>
 	</ScrollView>
 );
@@ -167,7 +168,7 @@ const MainNavigator = createDrawerNavigator({
 					name='home'
 					type='font-awesome'
 					size={24}
-					color={tintColor}
+					iconStyle={{ color: tintColor }}
 				/>
 			),
 		}
@@ -237,6 +238,7 @@ const MainNavigator = createDrawerNavigator({
 		}
 	}
 }, {
+	initialRouteName: 'Home',
 	drawerBackgroundColor: '#D1C4E9',
 	contentComponent: CustomDrawerContentComponent
 });

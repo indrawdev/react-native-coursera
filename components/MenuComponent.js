@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import { Tile } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { DISHES } from '../shared/dishes';
 import { baseUrl } from '../shared/baseUrl';
 import { Loading } from './LoadingComponent';
 
@@ -13,19 +12,18 @@ const mapStateToProps = state => {
 }
 
 class Menu extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			dishes: DISHES
-		};
-	}
+	// constructor(props) {
+	// 	super(props);
+	// 	this.state = {
+	// 		dishes: DISHES
+	// 	};
+	// }
 
 	static navigationOptions = {
 		title: 'Menu'
 	};
 
 	render() {
-		const { navigate } = this.props.navigation;
 		const renderMenuItem = ({ item, index }) => {
 
 			return (
@@ -37,8 +35,10 @@ class Menu extends Component {
 					onPress={() => navigate('Dishdetail', { dishId: item.id })}
 					imageSrc={{ uri: baseUrl + item.image }}
 				/>
-			);
+			)
 		};
+
+		const { navigate } = this.props.navigation;
 
 		if (this.props.dishes.isLoading) {
 			return (

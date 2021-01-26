@@ -25,27 +25,17 @@ function History() {
 }
 
 function CorporateLeadership(props) {
-	const renderLeaders = ({ item, index }) => {
-		return (
-			<ListItem
-				key={index}
-				title={item.name}
-				subtitle={item.description}
-				hideChevron={true}
-				leftAvatar={{ source: { uri: baseUrl + item.image } }}
-			/>
-		);
-	}
 
-	return (
-		<Card title="Corporate Leadership">
-			<FlatList
-				data={this.props.leaders.leaders}
-				renderItem={renderLeader}
-				keyExtractor={item => item.id.toString()}
-			/>
-		</Card>
-	);
+
+	// return (
+	// 	<Card title="Corporate Leadership">
+	// 		<FlatList
+	// 			data={this.props.leaders.leaders}
+	// 			renderItem={renderLeader}
+	// 			keyExtractor={item => item.id.toString()}
+	// 		/>
+	// 	</Card>
+	// );
 }
 
 class About extends Component {
@@ -62,6 +52,18 @@ class About extends Component {
 	};
 
 	render() {
+		const renderLeader = ({ item, index }) => {
+			return (
+				<ListItem
+					key={index}
+					title={item.name}
+					subtitle={item.description}
+					hideChevron={true}
+					leftAvatar={{ source: { uri: baseUrl + item.image } }}
+				/>
+			);
+		}
+		
 		if (this.props.leaders.isLoading) {
 			return (
 				<ScrollView>
