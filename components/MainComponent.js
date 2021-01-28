@@ -1,12 +1,5 @@
 import React, { Component } from 'react';
-import {
-	View,
-	Platform,
-	Text,
-	ScrollView,
-	Image,
-	StyleSheet
-} from 'react-native';
+import { View, Platform, Text, ScrollView, Image, StyleSheet, NetInfo, ToastAndroid } from 'react-native';
 import {
 	createStackNavigator,
 	createDrawerNavigator,
@@ -23,6 +16,7 @@ import Contact from './ContactComponent';
 import About from './AboutComponent';
 import Reservation from './ReservationComponent';
 import Favorites from './FavoriteComponent';
+import Login from './LoginComponent';
 
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
 
@@ -43,6 +37,24 @@ const mapDispatchToProps = dispatch => ({
 	fetchPromos: () => dispatch(fetchPromos()),
 	fetchLeaders: () => dispatch(fetchLeaders()),
 })
+
+const LoginNavigator = createStackNavigator({
+	Login: Login
+}, {
+	navigationOptions: ({ navigation }) => ({
+		headerStyle: {
+			backgroundColor: "#512DA8"
+		},
+		headerTitleStyle: {
+			color: "#fff"
+		},
+		title: 'Login',
+		headerTintColor: "#fff",
+		headerLeft: <Icon name="menu" size={24}
+			iconStyle={{ color: 'white' }}
+			onPress={() => navigation.toggleDrawer()} />
+	})
+});
 
 const HomeNavigator = createStackNavigator({
 	Home: { screen: Home }
@@ -146,17 +158,17 @@ const FavoritesNavigator = createStackNavigator({
 }, {
 	navigationOptions: ({ navigation }) => ({
 		headerStyle: {
-				backgroundColor: "#512DA8"
+			backgroundColor: "#512DA8"
 		},
 		headerTitleStyle: {
-				color: "#fff"            
+			color: "#fff"
 		},
 		headerTintColor: "#fff",
 		headerLeft: <Icon
 			name="menu"
 			size={24}
-			iconStyle={{ color: 'white' }} 
-			onPress={() => navigation.toggleDrawer()} />  
+			iconStyle={{ color: 'white' }}
+			onPress={() => navigation.toggleDrawer()} />
 	})
 });
 
@@ -266,7 +278,7 @@ const MainNavigator = createDrawerNavigator({
 			drawerIcon: ({ tintColor, focused }) => (
 				<Icon
 					name='heart'
-					type='font-awesome'            
+					type='font-awesome'
 					size={24}
 					iconStyle={{ color: tintColor }}
 				/>
@@ -294,6 +306,38 @@ class Main extends Component {
 		this.props.fetchComments();
 		this.props.fetchPromos();
 		this.props.fetchLeaders();
+
+		NetInfo.getConnectionInfo()
+			.then((connectionInfo) => {
+				ToastAndroid.show('Initial Network Connectivity Type: '
+					+ connectionInfo.type + ', effectiveType: ' + connectionInfo.effectiveType,
+					ToastAndroid.LONG)
+			});
+
+		NetInfo.addEvenListener('connectionChange', this.handleConnectivityChange);
+	}
+
+	componentWillUnmount() {
+		NetInfo.removeEventListener('connectionChange', this.handleConnectivityChange);
+	}
+
+	handleConnectivityChange = (connectionInfo) => {
+		switch (connectionInfo.type) {
+			case 'none':
+				ToastAndroid.show('You are now offline!', ToastAndroid.LONG);
+				break;
+			case 'wifi':
+				ToastAndroid.show('You are now connected to WiFi!', ToastAndroid.LONG);
+				break;
+			case 'cellular':
+				ToastAndroid.show('You are now connected to Cellular!', ToastAndroid.LONG);
+				break;
+			case 'unknown':
+				ToastAndroid.show('You now have unknown connection!', ToastAndroid.LONG);
+				break;
+			default:
+				break;
+		}
 	}
 
 	onDishSelect(dishId) {
@@ -301,7 +345,6 @@ class Main extends Component {
 	}
 
 	render() {
-
 		return (
 			<View style={{ flex: 1 }}>
 				<MainNavigator />
