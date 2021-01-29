@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Switch, Picker, Button, Modal, ScrollView, Alert } from 'react-native';
-import { Card } from 'react-native-elements';
+import { Text, View, StyleSheet, Switch, Picker, Button, ScrollView, Alert } from 'react-native';
 import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable';
 
@@ -36,13 +35,12 @@ class Reservation extends Component {
 				{
 					text: 'Cancel',
 					onPress: () => this.resetForm(),
-					style: ' cancel'
+					style: 'cancel'
 				},
 				{
 					text: 'Ok',
 					onPress: () => { console.log(JSON.stringify(this.state)); this.resetForm(); }
-				},
-				{ cancelable: false }
+				}
 			]
 		);
 	}
