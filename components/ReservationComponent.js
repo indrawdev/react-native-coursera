@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { Text, View, StyleSheet, Switch, Picker, Button, ScrollView, Alert } from 'react-native';
 import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable';
-import { Permissions, Notifications } from 'expo';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+import * as Calendar from 'expo-calendar';
 
 class Reservation extends Component {
 
@@ -38,13 +40,51 @@ class Reservation extends Component {
 			title: 'Your Reservation',
 			body: 'Reservation for ' + date + ' requested',
 			ios: {
-				sound: true
+				sound: true,
+				_displayInForeground: true
 			},
 			android: {
 				sound: true,
 				vibrate: true,
-				color: '#512DA8'
+				color: '#512DA8',
+				sticky: true
 			}
+		});
+	}
+
+	async obtainCalendarPermission() {
+		let permission = await Permissions.getAsync(Permissions.CALENDAR);
+		if (permission.status !== 'granted') {
+			permission = await Permissions.askAsync(Permissions.CALENDAR);
+			if (permission.status !== 'granted') {
+				Alert.alert('Permission not granted to use calendar');
+			}
+		}
+		return permission;
+	}
+
+	async getDefaultCalendarId() {
+		const calendars = await Calendar.getCalendarsAsync();
+		console.log('Calendars 2 : ' + calendars);
+		const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+		console.log('defaultCalendars[0].id : ' + defaultCalendars[0].id);
+		return defaultCalendars[0].id;
+	}
+
+	async addReservationToCalendar(date) {
+		await this.obtainCalendarPermission();
+		console.log('Date : ' + date);
+		const calendars = await Calendar.getCalendarsAsync();
+		console.log('Calendars 1 : ' + calendars);
+		const defaultCalenderId = await this.getDefaultCalendarId();
+		console.log('defaultCalendarId : ' + defaultCalenderId);
+
+		Calendar.createEventAsync(defaultCalenderId, {
+			title: 'Con Fusion Table Reservation',
+			startDate: new Date(Date.parse(date)),
+			endDate: new Date(Date.parse(date) + (2 * 60 * 60 * 1000)),
+			timeZone: 'Asia/Hong_Kong',
+			location: '121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong'
 		});
 	}
 
@@ -66,10 +106,16 @@ class Reservation extends Component {
 					style: 'cancel'
 				},
 				{
-					text: 'Ok',
-					onPress: () => { console.log(JSON.stringify(this.state)); this.resetForm(); }
+					text: 'OK',
+					onPress: () => {
+						console.log(JSON.stringify(this.state));
+						this.presentLocalNotification(this.state.date);
+						this.addReservationToCalendar(this.state.date);
+						this.resetForm();
+					}
 				}
-			]
+			],
+			{ cancelable: false }
 		);
 	}
 
@@ -137,7 +183,6 @@ class Reservation extends Component {
 					</View>
 					<View style={styles.formRow}>
 						<Button
-							onPress={() => this.handleReservation()}
 							title="Reserve"
 							color="#512DA8"
 							accessibilityLabel="Learn more about this purple button"

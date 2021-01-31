@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, ScrollView, Image } from 'react-native';
 import { Input, CheckBox, Button, Icon } from 'react-native-elements';
-import { SecureStore, Camera, Permissions, ImagePicker, Asset, ImageManipulator } from 'expo';
+import * as SecureStore from 'expo-secure-store';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from "expo-image-manipulator";
+import { Asset } from 'expo-asset';
 import { createBottomTabNavigator } from 'react-navigation';
 import { baseUrl } from '../shared/baseUrl';
 
@@ -79,6 +83,7 @@ class LoginTab extends Component {
 					<Button
 						onPress={() => this.handleLogin()}
 						title="Login"
+						color="#512DA8"
 						icon={
 							<Icon
 								name='sign-in'
@@ -87,9 +92,7 @@ class LoginTab extends Component {
 								color='white'
 							/>
 						}
-						buttonStyle={{
-							backgroundColor="#512DAB"
-						}}
+						buttonStyle={{ backgroundColor: "#512DA8" }}
 					/>
 				</View>
 				<View style={styles.formButton}>
@@ -105,9 +108,7 @@ class LoginTab extends Component {
 								color='blue'
 							/>
 						}
-						titleStyle={{
-							color: 'blue'
-						}}
+						titleStyle={{ color: 'blue' }}
 					/>
 				</View>
 			</View>
@@ -161,6 +162,26 @@ class RegisterTab extends Component {
 		this.setState({ imageUrl: processedImage.uri });
 	}
 
+	getImageFromGallery = async () => { 
+		const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+		if (cameraRollPermission.status === 'granted') {
+			try {
+				let choosenImage = await ImagePicker.launchImageLibraryAsync({
+					mediaTypes: ImagePicker.MediaTypeOptions.All,
+					allowsEditing: true,
+					aspect: [4, 3],
+					quality: 1,
+				});
+				if (!choosenImage.cancelled) {
+					this.processImage(choosenImage.uri);
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	}
+
 	static navigationOptions = {
 		title: 'Register',
 		tabBarIcon: ({ tintColor, focused }) => (
@@ -178,6 +199,9 @@ class RegisterTab extends Component {
 		if (this.state.remember) {
 			SecureStore.setItemAsync('userinfo', JSON.stringify({ username: this.state.username, password: this.state.password }))
 				.catch((error) => console.log('Could not save user info', error));
+		} else {
+			SecureStore.deleteItemAsync('userinfo')
+				.catch((error) => console.log('Could not delete user info', error));
 		}
 	}
 
@@ -194,6 +218,10 @@ class RegisterTab extends Component {
 						<Button
 							title="Camera"
 							onPress={this.getImageFromCamera}
+						/>
+						<Button
+							title="Gallery"
+							onPress={ this.getImageFromGallery}
 						/>
 					</View>
 					<Input
@@ -213,7 +241,7 @@ class RegisterTab extends Component {
 					<Input
 						placeholder="First Name"
 						leftIcon={{ type: 'font-awesome', name: 'user-o' }}
-						onChangeText={(lastname) => this.setState({ firstname })}
+						onChangeText={(firstname) => this.setState({ firstname })}
 						value={this.state.firstname}
 						containerStyle={styles.formInput}
 					/>
@@ -260,33 +288,6 @@ class RegisterTab extends Component {
 	}
 }
 
-const styles = StyleSheet.create({
-	container: {
-		justifyContent: 'center',
-		margin: 20,
-	},
-	imageContainer: {
-		flex: 1,
-		flexDirection: 'row',
-		margin: 20
-	},
-	image: {
-		margin: 10,
-		width: 80,
-		height: 60
-	},
-	formInput: {
-		margin: 20
-	},
-	formCheckbox: {
-		margin: 20,
-		backgroundColor: null
-	},
-	formButton: {
-		margin: 60
-	}
-});
-
 const Login = createBottomTabNavigator({
 	Login: LoginTab,
 	Register: RegisterTab
@@ -298,5 +299,32 @@ const Login = createBottomTabNavigator({
 		inactiveTintColor: 'gray'
 	}
 })
+
+const styles = StyleSheet.create({
+	container: {
+		justifyContent: 'center',
+		margin: 10,
+	},
+	imageContainer: {
+		flex: 1,
+		flexDirection: 'row',
+		margin: 5
+	},
+	image: {
+		margin: 10,
+		width: 80,
+		height: 60
+	},
+	formInput: {
+		margin: 5
+	},
+	formCheckbox: {
+		margin: 5,
+		backgroundColor: null
+	},
+	formButton: {
+		margin: 0
+	}
+});
 
 export default Login;
